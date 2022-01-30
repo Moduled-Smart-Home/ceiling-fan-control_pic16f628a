@@ -24,12 +24,19 @@ extern "C" {
 #define P_SCL PORTBbits.RB4
 #define P_SDA PORTBbits.RB5
     
-typedef enum {UNDEFINED, IDLE, REC_ADDR, ACK_DOWN, ACK_UP, REC_DATA, SEND_DATA, ACK_DOWN1, ACK_UP1, WAIT_FOR_NAK, WAIT_FOR_IDLE, WAIT_START_STOP} I2C_STATE;
+typedef enum {UNDEFINED, IDLE, REC_ADDR, ACK_DOWN, ACK_UP, REC_DATA, SEND_DATA, ACK_DOWN1, ACK_UP1, WAIT_FOR_NAK, WAIT_START_STOP} I2C_STATE;
 I2C_STATE i2c_state = UNDEFINED;
+
+
+
+typedef enum  {LED_ON, LED_OFF, POT1, POT2} messages_t;
+messages_t cmd;
 
 unsigned char SLAVE_ADDRESS_8bits;
 unsigned char SCL_actual, SDA_actual, SCL_prev, SDA_prev, idleCheck;
 unsigned char address_rec, counter_rec, counter_send, data_rec, data_send, data;
+
+unsigned char DATA_RECEIVED;
 enum {W=0, R=1} wr;
     
 void i2cPinsConfig(void);

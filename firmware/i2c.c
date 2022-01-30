@@ -47,7 +47,8 @@ void i2cInterruptHandle(unsigned char SCL, unsigned char SDA) {
                             i2c_state = ACK_DOWN;
                         }
                         else {
-                            i2c_state = WAIT_FOR_IDLE;
+                            //i2c_state = WAIT_FOR_IDLE;
+                            i2c_state = IDLE;
                         }
                         
                     }
@@ -98,6 +99,8 @@ void i2cInterruptHandle(unsigned char SCL, unsigned char SDA) {
                     if (counter_rec == 8) {
                         counter_rec=0;
                         data = data_rec;
+                        cmd = data_rec;
+                        DATA_RECEIVED = 1;
                         i2c_state = ACK_DOWN1;
                     }
                 }
@@ -154,7 +157,8 @@ void i2cInterruptHandle(unsigned char SCL, unsigned char SDA) {
                     }
                     else if (SDA_actual == 1 && SDA_prev == 0) {
                         // got STOP signal
-                        i2c_state = WAIT_FOR_IDLE;
+                        //i2c_state = WAIT_FOR_IDLE;
+                        i2c_state = IDLE;
                     }
                 }
                 break;
