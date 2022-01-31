@@ -40,12 +40,17 @@ PORTBbits_t LATCHB, LATCHB_prev;
 #define TIME_TRIGG_POT2_us 4000
 #define TIME_HOLD_us 1000
 
-#define TIMER_SETUP_POT1 65536 - (TIME_TRIGG_POT1_us/1.6)
-#define TIMER_SETUP_POT2 65536 - (TIME_TRIGG_POT2_us/1.6)
-#define TIMER_SETUP_HOLD 65536 - (TIME_HOLD_us/1.6)
-//#define TIMER_SETUP_POT1 65536 -(unsigned short) (TIME_TRIGG_POT1_us / ((long)(1000000 * 8) * (double)(1/(_XTAL_FREQ/4))))
+
+
+//#define TIMER_SETUP_POT1 65536 - (TIME_TRIGG_POT1_us/1.6)
+//#define TIMER_SETUP_POT2 65536 - (TIME_TRIGG_POT2_us/1.6)
+//#define TIMER_SETUP_HOLD 65536 - (TIME_HOLD_us/1.6)
+//#define TIMER_SETUP_POT1 65536 -(unsigned short) (TIME_TRIGG_POT1_us / ((1000000 * 8) * (1/(_XTAL_FREQ/4))))
 //#define TIMER_SETUP_POT2 65536 - (unsigned short) TIME_TRIGG_POT2_us / ((1/(_XTAL_FREQ/4)) * 1000000 * 8) 
 //#define TIMER_SETUP_HOLD 65536 - (unsigned short) TIME_HOLD_us / ((1/(_XTAL_FREQ/4)) * 1000000 * 8) 
+
+static unsigned short TICKS_PER_US = _XTAL_FREQ / (4 * 1000000);
+static unsigned short TIMER_SETUP_POT1, TIMER_SETUP_POT2, TIMER_SETUP_HOLD;
 
 typedef enum {ZERO_CROSSED, TRIGGED, READY} triac_state_t;
 triac_state_t triac_1;
@@ -112,6 +117,10 @@ void  __interrupt(high_priority) myHighIsr(void) {
 
 
 void main(void) {
+    TIMER_SETUP_POT1 = 65535 - (TIME_TRIGG_POT1_us * TICKS_PER_US);
+    TIMER_SETUP_POT2 = 65535 - (TIME_TRIGG_POT2_us * TICKS_PER_US);
+    TIMER_SETUP_HOLD = 65535 - (TIME_HOLD_us * TICKS_PER_US);
+    
      // XTAL Oscilator
     TRISAbits.TRISA6 = 1;
     TRISAbits.TRISA7 = 1;
@@ -134,8 +143,8 @@ void main(void) {
     TMR1CS = 0; //timer mode
     PEIE = 1; //enable peripheral interrupt
     
-    T1CKPS0 = 1; //prescale 1:8
-    T1CKPS1 = 1;
+    T1CKPS0 = 0; //prescale 1:1
+    T1CKPS1 = 0;
     
     setSlaveAddress8bits(0xAA);
     
