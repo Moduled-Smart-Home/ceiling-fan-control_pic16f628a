@@ -38,12 +38,14 @@ PORTBbits_t LATCHB, LATCHB_prev;
 //#define TIME_TRIGG_us 6500
 #define TIME_HOLD_us 1000
 #define TIME_TRIGG_MAX_us 7333
+#define TIME_TRIGG_MIN_us 0
+
 #define TIME_TRIGG_POT1_us 6500
 #define TIME_TRIGG_POT2_us 4000
 #define TIME_HOLD_us 1000
 
 static unsigned short TICKS_PER_US = _XTAL_FREQ / (4 * 1000000);
-static unsigned short TIMER_SETUP_POT1, TIMER_SETUP_POT2, TIMER_SETUP_HOLD;
+static unsigned short TIMER_SETUP_POT, TIMER_SETUP_POT1, TIMER_SETUP_POT2, TIMER_SETUP_HOLD;
 
 typedef enum {ZERO_CROSSED, TRIGGED, READY} triac_state_t;
 triac_state_t triac_fan;
@@ -97,13 +99,7 @@ void  __interrupt(high_priority) myHighIsr(void) {
         INTF=0;
         
         if (fan_state != OFF) {
-            if (POT_LEVEL == 1) {
-                TMR1 = TIMER_SETUP_POT1;
-            }
-            else if (POT_LEVEL == 2) {
-                TMR1 = TIMER_SETUP_POT2;
-            }
-
+            TMR1 = TIMER_SETUP_POT;
             triac_fan = ZERO_CROSSED;
             TMR1IE = 1; //enable TMR1 interrupt
             TMR1ON = 1; //start TMR1
@@ -141,8 +137,7 @@ void  __interrupt(high_priority) myHighIsr(void) {
 
 
 void main(void) {
-    TIMER_SETUP_POT1 = 65535 - (TIME_TRIGG_POT1_us * TICKS_PER_US);
-    TIMER_SETUP_POT2 = 65535 - (TIME_TRIGG_POT2_us * TICKS_PER_US);
+    TIMER_SETUP_POT = 65535 - 0.9*TIME_TRIGG_MAX_us*TICKS_PER_US; // start with minimum power
     TIMER_SETUP_HOLD = 65535 - (TIME_HOLD_us * TICKS_PER_US);
     
      // XTAL Oscilator
@@ -210,14 +205,26 @@ void main(void) {
                 case FAN_ON_DIR2:
                     fan_state = ON_DIR2;
                     break;
-                    
+                        
                 case POT1:
-                    POT_LEVEL = 1;
+                    TIMER_SETUP_POT = 65535 - 0.9*TIME_TRIGG_MAX_us*TICKS_PER_US;
                     break;
                     
                 case POT2:
-                    POT_LEVEL = 2;
+                    TIMER_SETUP_POT = 65535 - 0.7*TIME_TRIGG_MAX_us*TICKS_PER_US;
                     break;
+                
+                case POT3:
+                    TIMER_SETUP_POT = 65535 - 0.5*TIME_TRIGG_MAX_us*TICKS_PER_US;
+                    break;
+                
+                case POT4:
+                    TIMER_SETUP_POT = 65535 - 0.25*TIME_TRIGG_MAX_us*TICKS_PER_US;;
+                    break;
+                    
+                case POT5:
+                    TIMER_SETUP_POT = 65535;
+                    break;    
             }
             
             DATA_RECEIVED = 0;

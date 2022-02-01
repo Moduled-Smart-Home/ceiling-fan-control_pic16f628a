@@ -29,7 +29,7 @@ I2C_STATE i2c_state = UNDEFINED;
 
 
 
-typedef enum  {LED_ON, LED_OFF, FAN_OFF, FAN_ON_DIR1, FAN_ON_DIR2, POT1, POT2} messages_t;
+typedef enum  {LED_ON, LED_OFF, FAN_OFF, FAN_ON_DIR1, FAN_ON_DIR2, POT1, POT2, POT3, POT4, POT5} messages_t;
 messages_t cmd;
 
 unsigned char SLAVE_ADDRESS_8bits;
