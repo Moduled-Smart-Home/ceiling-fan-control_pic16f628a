@@ -31,7 +31,9 @@ PORTAbits_t LATCHA;
 PORTBbits_t LATCHB, LATCHB_prev;
 
 #define LED LATCHA.RA3
-#define TRIAC_1 LATCHA.RA0
+#define FAN_DIR1 LATCHA.RA0
+#define FAN_DIR2 LATCHA.RA1
+#define LAMP LATCHA.RA2
 
 //#define TIME_TRIGG_us 6500
 #define TIME_HOLD_us 1000
@@ -40,22 +42,18 @@ PORTBbits_t LATCHB, LATCHB_prev;
 #define TIME_TRIGG_POT2_us 4000
 #define TIME_HOLD_us 1000
 
-
-
-//#define TIMER_SETUP_POT1 65536 - (TIME_TRIGG_POT1_us/1.6)
-//#define TIMER_SETUP_POT2 65536 - (TIME_TRIGG_POT2_us/1.6)
-//#define TIMER_SETUP_HOLD 65536 - (TIME_HOLD_us/1.6)
-//#define TIMER_SETUP_POT1 65536 -(unsigned short) (TIME_TRIGG_POT1_us / ((1000000 * 8) * (1/(_XTAL_FREQ/4))))
-//#define TIMER_SETUP_POT2 65536 - (unsigned short) TIME_TRIGG_POT2_us / ((1/(_XTAL_FREQ/4)) * 1000000 * 8) 
-//#define TIMER_SETUP_HOLD 65536 - (unsigned short) TIME_HOLD_us / ((1/(_XTAL_FREQ/4)) * 1000000 * 8) 
-
 static unsigned short TICKS_PER_US = _XTAL_FREQ / (4 * 1000000);
 static unsigned short TIMER_SETUP_POT1, TIMER_SETUP_POT2, TIMER_SETUP_HOLD;
 
 typedef enum {ZERO_CROSSED, TRIGGED, READY} triac_state_t;
-triac_state_t triac_1;
+triac_state_t triac_fan;
+triac_state_t triac_lamp;
 
-signed char POT_LEVEL = -1;
+typedef enum {OFF, ON_DIR1, ON_DIR2} fan_state_t;
+fan_state_t fan_state;
+
+
+signed char POT_LEVEL = 1;
 
 void toggleLED(void) {
     LED = !LED;
@@ -67,48 +65,74 @@ void setLED(unsigned char value) {
     PORTAbits = LATCHA;
 }
 
-void setTriac1(unsigned char value) {
-    TRIAC_1 = value;
+void setFanDir1(unsigned char value) {
+    FAN_DIR2 = 0;
+    FAN_DIR1 = value;
+    PORTAbits = LATCHA;
+}
+
+void setFanDir2(unsigned char value) {
+    FAN_DIR1 = 0;
+    FAN_DIR2 = value;
+    PORTAbits = LATCHA;
+}
+
+void setLamp(unsigned char value) {
+    LAMP = value;
     PORTAbits = LATCHA;
 }
 
 void  __interrupt(high_priority) myHighIsr(void) {
     if (RBIE && RBIF) {
         INTE = 0;
+        TMR1IE = 0;
         LATCHB = PORTBbits;
         i2cInterruptHandle(LATCHB.RB4, LATCHB.RB5);
         RBIF=0;
         INTE = 1;
+        TMR1IE = 1;
     }
     
     if (INTE && INTF) {
         INTF=0;
         
-        if (POT_LEVEL > 0) {
+        if (fan_state != OFF) {
             if (POT_LEVEL == 1) {
-            TMR1 = TIMER_SETUP_POT1;
+                TMR1 = TIMER_SETUP_POT1;
             }
             else if (POT_LEVEL == 2) {
                 TMR1 = TIMER_SETUP_POT2;
             }
-        
-            triac_1 = ZERO_CROSSED;
+
+            triac_fan = ZERO_CROSSED;
             TMR1IE = 1; //enable TMR1 interrupt
-            TMR1ON = 1; //start TMR1 count
+            TMR1ON = 1; //start TMR1
         }
     }
     
     if (TMR1IE && TMR1IF) {
         TMR1IF = 0;
         
-        if (triac_1 == ZERO_CROSSED) {
-            setTriac1(1);
+        if (triac_fan == ZERO_CROSSED) {
+            switch (fan_state) {
+                case ON_DIR1:
+                    setFanDir1(1);
+                    break;
+                    
+                case ON_DIR2:
+                    setFanDir2(1);
+                    break;
+            }
+
             TMR1 = TIMER_SETUP_HOLD;
-            triac_1 = TRIGGED;
+            triac_fan = TRIGGED;
         }
-        else if (triac_1 == TRIGGED) {
-            setTriac1(0);
-            triac_1 = READY;
+        
+        else if (triac_fan == TRIGGED) {
+            setFanDir1(0);
+            setFanDir2(0);
+            triac_fan = READY;
+            TMR1IE = 0; //disable TMR1 interrupt
             TMR1ON = 0; //stop TMR1
         }
     }
@@ -150,7 +174,8 @@ void main(void) {
     
     DATA_RECEIVED = 0;
     
-    triac_1 = READY;
+    fan_state = OFF;
+    triac_fan = READY;
     
     int ret;
     ret = startI2C();
@@ -164,19 +189,35 @@ void main(void) {
 //        }
         
         if (DATA_RECEIVED == 1) {
-            
-            
-            if (cmd == LED_OFF) {
-                setLED(0);
-            }
-            else if (cmd == LED_ON) {
-                setLED(1);
-            }
-            else if (cmd == POT1) {
-                POT_LEVEL = 1;
-            }
-            else if (cmd == POT2) {
-                POT_LEVEL = 2;
+
+            switch (cmd) {
+                case LED_OFF:
+                   setLED(0);
+                   break;
+                
+                case LED_ON:
+                    setLED(1);
+                    break;
+                    
+                case FAN_OFF:
+                    fan_state = OFF;
+                    break;
+                    
+                case FAN_ON_DIR1:
+                    fan_state = ON_DIR1;
+                    break;
+                    
+                case FAN_ON_DIR2:
+                    fan_state = ON_DIR2;
+                    break;
+                    
+                case POT1:
+                    POT_LEVEL = 1;
+                    break;
+                    
+                case POT2:
+                    POT_LEVEL = 2;
+                    break;
             }
             
             DATA_RECEIVED = 0;
