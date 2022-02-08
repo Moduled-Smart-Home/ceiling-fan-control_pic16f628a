@@ -147,7 +147,9 @@ void main(void) {
     // Configuration LED e MOC
     PCONbits.OSCF=1;
     TRISAbits.TRISA3 = 0; //Output - LED
-    TRISAbits.TRISA0 = 0; //Output - MOC 
+    TRISAbits.TRISA0 = 0; //Output - FAN_DIR1
+    TRISAbits.TRISA1 = 0; //Output - FAN_DIR2
+    TRISAbits.TRISA2 = 0; //Output - LAMP
     
     // Configuration Zero Crossing Interrupt
     TRISBbits.TRISB0 = 1;
@@ -207,19 +209,19 @@ void main(void) {
                     break;
                         
                 case POT1:
-                    TIMER_SETUP_POT = 65535 - 0.9*TIME_TRIGG_MAX_us*TICKS_PER_US;
+                    TIMER_SETUP_POT = 65535 - 0.95*TIME_TRIGG_MAX_us*TICKS_PER_US;
                     break;
                     
                 case POT2:
-                    TIMER_SETUP_POT = 65535 - 0.7*TIME_TRIGG_MAX_us*TICKS_PER_US;
+                    TIMER_SETUP_POT = 65535 - 0.85*TIME_TRIGG_MAX_us*TICKS_PER_US;
                     break;
                 
                 case POT3:
-                    TIMER_SETUP_POT = 65535 - 0.5*TIME_TRIGG_MAX_us*TICKS_PER_US;
+                    TIMER_SETUP_POT = 65535 - 0.65*TIME_TRIGG_MAX_us*TICKS_PER_US;
                     break;
                 
                 case POT4:
-                    TIMER_SETUP_POT = 65535 - 0.25*TIME_TRIGG_MAX_us*TICKS_PER_US;;
+                    TIMER_SETUP_POT = 65535 - 0.40*TIME_TRIGG_MAX_us*TICKS_PER_US;;
                     break;
                     
                 case POT5:
