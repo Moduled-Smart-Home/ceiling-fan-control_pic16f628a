@@ -54,9 +54,6 @@ triac_state_t triac_lamp;
 typedef enum {OFF, ON_DIR1, ON_DIR2} fan_state_t;
 fan_state_t fan_state;
 
-
-signed char POT_LEVEL = 1;
-
 void toggleLED(void) {
     LED = !LED;
     PORTAbits = LATCHA;
@@ -64,6 +61,11 @@ void toggleLED(void) {
 
 void setLED(unsigned char value) {
     LED = value;
+    PORTAbits = LATCHA;
+}
+
+void setLAMP(unsigned char value) {
+    LAMP = value;
     PORTAbits = LATCHA;
 }
 
@@ -76,11 +78,6 @@ void setFanDir1(unsigned char value) {
 void setFanDir2(unsigned char value) {
     FAN_DIR1 = 0;
     FAN_DIR2 = value;
-    PORTAbits = LATCHA;
-}
-
-void setLamp(unsigned char value) {
-    LAMP = value;
     PORTAbits = LATCHA;
 }
 
@@ -103,7 +100,7 @@ void  __interrupt(high_priority) myHighIsr(void) {
             triac_fan = ZERO_CROSSED;
             TMR1IE = 1; //enable TMR1 interrupt
             TMR1ON = 1; //start TMR1
-        }
+        }        
     }
     
     if (TMR1IE && TMR1IF) {
@@ -133,7 +130,6 @@ void  __interrupt(high_priority) myHighIsr(void) {
         }
     }
 }
-
 
 
 void main(void) {
@@ -226,14 +222,20 @@ void main(void) {
                     
                 case POT5:
                     TIMER_SETUP_POT = 65535;
-                    break;    
+                    break;
+                    
+                case LAMP_ON:
+                    setLAMP(1);
+                    break;
+                    
+                case LAMP_OFF:
+                    setLAMP(0);
+                    break;
             }
             
             DATA_RECEIVED = 0;
         }
-        
     }
-    
     
     return;
 }
