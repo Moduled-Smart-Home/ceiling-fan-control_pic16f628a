@@ -1,0 +1,19 @@
+v-bit 90
+dep 0.1mm
+feed 25 x 2
+offset outside -0.15 mm
+
+offset inside = -0.3
+
+
+trilha grossa
+dep 0.1mm
+offset outside -0.15 mm
+
+drill:
+
+dep 2.5mm
+feed 20
+plunge fedd 80
+
+
