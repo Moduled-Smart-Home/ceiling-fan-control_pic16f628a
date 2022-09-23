@@ -175,6 +175,8 @@ void main(void) {
     
     setLED(0);
     
+    setLAMP(1); 
+    
     while(1) {      
 
 //        if (i2c_state == REC_DATA) {
@@ -209,19 +211,19 @@ void main(void) {
                     break;
                     
                 case POT2:
-                    TIMER_SETUP_POT = 65535 - 0.85*TIME_TRIGG_MAX_us*TICKS_PER_US;
+                    TIMER_SETUP_POT = 65535 - 0.90*TIME_TRIGG_MAX_us*TICKS_PER_US;
                     break;
                 
                 case POT3:
-                    TIMER_SETUP_POT = 65535 - 0.65*TIME_TRIGG_MAX_us*TICKS_PER_US;
+                    TIMER_SETUP_POT = 65535 - 0.85*TIME_TRIGG_MAX_us*TICKS_PER_US;
                     break;
                 
                 case POT4:
-                    TIMER_SETUP_POT = 65535 - 0.40*TIME_TRIGG_MAX_us*TICKS_PER_US;;
+                    TIMER_SETUP_POT = 65535 - 0.65*TIME_TRIGG_MAX_us*TICKS_PER_US;
                     break;
                     
                 case POT5:
-                    TIMER_SETUP_POT = 65535;
+                    TIMER_SETUP_POT = 65535 - 0.30*TIME_TRIGG_MAX_us*TICKS_PER_US;
                     break;
                     
                 case LAMP_ON:
