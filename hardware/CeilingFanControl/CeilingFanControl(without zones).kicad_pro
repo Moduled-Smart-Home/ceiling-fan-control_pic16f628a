@@ -402,7 +402,7 @@
     "last_paths": {
       "gencad": "",
       "idf": "",
-      "netlist": "",
+      "netlist": "CeilingFanControl.net",
       "specctra_dsn": "",
       "step": "",
       "vrml": ""
