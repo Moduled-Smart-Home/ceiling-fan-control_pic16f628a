@@ -1,0 +1,97 @@
+{
+  "Header": {
+    "GenerationSoftware": {
+      "Vendor": "KiCad",
+      "Application": "Pcbnew",
+      "Version": "7.0.1"
+    },
+    "CreationDate": "2023-03-28T23:11:37-03:00"
+  },
+  "GeneralSpecs": {
+    "ProjectId": {
+      "Name": "CeilingFanControl",
+      "GUID": "4365696c-696e-4674-9661-6e436f6e7472",
+      "Revision": "rev?"
+    },
+    "Size": {
+      "X": 61.0,
+      "Y": 61.2
+    },
+    "LayerNumber": 2,
+    "BoardThickness": 1.6,
+    "Finish": "None"
+  },
+  "DesignRules": [
+    {
+      "Layers": "Outer",
+      "PadToPad": 0.4,
+      "PadToTrack": 0.4,
+      "TrackToTrack": 0.4,
+      "MinLineWidth": 0.25,
+      "TrackToRegion": 0.7,
+      "RegionToRegion": 0.7
+    }
+  ],
+  "FilesAttributes": [
+    {
+      "Path": "CeilingFanControl-cobre frontal.gbr",
+      "FileFunction": "Copper,L1,Top",
+      "FilePolarity": "Positive"
+    },
+    {
+      "Path": "CeilingFanControl-Cobre traseira.gbr",
+      "FileFunction": "Copper,L2,Bot",
+      "FilePolarity": "Positive"
+    },
+    {
+      "Path": "CeilingFanControl-Cortes contorno.gbr",
+      "FileFunction": "Profile",
+      "FilePolarity": "Positive"
+    }
+  ],
+  "MaterialStackup": [
+    {
+      "Type": "Legend",
+      "Name": "Top Silk Screen"
+    },
+    {
+      "Type": "SolderPaste",
+      "Name": "Top Solder Paste"
+    },
+    {
+      "Type": "SolderMask",
+      "Thickness": 0.01,
+      "Name": "Top Solder Mask"
+    },
+    {
+      "Type": "Copper",
+      "Thickness": 0.035,
+      "Name": "cobre frontal"
+    },
+    {
+      "Type": "Dielectric",
+      "Thickness": 1.51,
+      "Material": "FR4",
+      "Name": "cobre frontal/Cobre traseira",
+      "Notes": "Type: dielectric layer 1 (from cobre frontal to Cobre traseira)"
+    },
+    {
+      "Type": "Copper",
+      "Thickness": 0.035,
+      "Name": "Cobre traseira"
+    },
+    {
+      "Type": "SolderMask",
+      "Thickness": 0.01,
+      "Name": "Bottom Solder Mask"
+    },
+    {
+      "Type": "SolderPaste",
+      "Name": "Bottom Solder Paste"
+    },
+    {
+      "Type": "Legend",
+      "Name": "Bottom Silk Screen"
+    }
+  ]
+}
